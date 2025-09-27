@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Development-only: allow reading users to support client-side login
+    match /users/{userId} {
+      allow read: if true; // TODO: tighten in production
+      allow write: if false;
+    }
+
+    // Default: allow reads for public collections you need (adjust as needed)
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if true; // Consider restricting writes to admins via callable functions
+    }
+  }
+}
+
+
