@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../Backend/firebase/config.js";
+import { db } from "../firebase/config.js";
 import { Navigate, useLocation } from "react-router-dom";
 
 function RequireAuth({ children }) {

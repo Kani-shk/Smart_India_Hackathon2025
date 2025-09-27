@@ -7,21 +7,19 @@ const OurStory = () => {
       <h2 className="ourstory-title">Our Story</h2>
       <div className="ourstory-content">
         <p>
-          Our journey began with a simple idea: to turn compassion into action.
-          What started as a handful of volunteers has grown into a vibrant
-          community, united by the belief that every donation can spark real
-          change.
+         
         </p>
         <div className="ourstory-quote-box">
           <blockquote>
-            “Kindness is the thread that weaves communities together.”
+            “It all began with a simple question: “What if the food we waste every day could bring hope to someone else’s table?”
+            
           </blockquote>
-          <cite>- FoodShare Team</cite>
+          <cite>- Team HungerHackers</cite>
         </div>
         <p>
-          Today, we organize events, support those in need, and set aside 20% of
-          every donation for emergencies—so help is always within reach. Together,
-          we’re building a future where generosity and hope go hand in hand.
+          So, we decided to bridge it. Not with charity, but with compassion, technology, and community. <br /><br />
+
+For us, this is not just a project. It’s a promise — to stand together against hunger, to value every grain, and to believe that a shared meal can change more than just a day; it can change a life
         </p>
       </div>
     </section>

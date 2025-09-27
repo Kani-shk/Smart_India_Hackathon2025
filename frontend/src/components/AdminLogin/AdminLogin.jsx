@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../../../Backend/firebase/config.js";
+import { db } from "../../firebase/config.js";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function AdminLogin() {

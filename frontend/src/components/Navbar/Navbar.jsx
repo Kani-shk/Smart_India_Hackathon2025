@@ -13,7 +13,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container">
         <div className="nav-brand">
-          <a href="/">FoodShare</a>
+          <a href="/">SharePlate</a>
         </div>
 
         <div className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
