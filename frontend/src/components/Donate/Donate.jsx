@@ -1,5 +1,7 @@
+
 import React from "react";
 import "./Donate.css";
+import qrImage from "../../assets/Kanishk QR.jpeg";
 
 const Donate = () => (
   <section className="donate-section">
@@ -9,7 +11,7 @@ const Donate = () => (
     </p>
 
     <div className="donate-qr">
-      <img src="https://randomqr.com/assets/images/rickroll-qrcode.webp" alt="Donate QR Code" />
+      <img src={qrImage} alt="Donate QR Code" style={{ maxWidth: "300px", width: "100%", height: "auto" }} />
     </div>
 
     <div className="fund-allocation">
