@@ -150,11 +150,12 @@ const ReadOnlyEventsList = () => {
           <div className="events-grid">{ongoing.map(renderEventCard)}</div>
         </div>
       )}
-
-      <div className="events-section upcoming-section">
-        <h2 className="section-title">
+      <div>
+        <h2 className="main-title">
           <span className="section-emoji">✨</span> Upcoming Events
         </h2>
+      </div>
+      <div className="events-section upcoming-section">
         {upcoming.length === 0 ? (
           <div className="no-events">
             <div className="no-events-icon">📭</div>
@@ -165,12 +166,13 @@ const ReadOnlyEventsList = () => {
           <div className="events-grid">{upcoming.map(renderEventCard)}</div>
         )}
       </div>
-
+      <div>
+        <h2 className="main-title">
+          <span className="section-emoji">📜</span> Past Events
+        </h2>
+      </div>
       {finished.length > 0 && (
         <div className="events-section finished-section">
-          <h2 className="section-title">
-            <span className="section-emoji">📜</span> Past Events
-          </h2>
           <div className="events-grid">{finished.map(renderEventCard)}</div>
         </div>
       )}

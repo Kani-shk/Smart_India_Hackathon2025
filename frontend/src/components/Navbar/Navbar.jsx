@@ -13,7 +13,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container">
         <div className="nav-brand">
-          <a href="/">SharePlate</a>
+          <a href="/"><img src="../src/assets/SharePlateLogo.jpg" height="80" width="160" href="/"/></a>
         </div>
 
         <div className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
