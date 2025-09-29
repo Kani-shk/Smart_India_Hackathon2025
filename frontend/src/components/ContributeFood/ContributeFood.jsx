@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { db } from "../../firebase/config";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import "./ContributeFood.css";
 
 const ContributeFood = () => {
@@ -22,9 +24,28 @@ const ContributeFood = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    // Persist to Firestore
+    try {
+      await addDoc(collection(db, "foodContributions"), {
+        providerName: formData.providerName,
+        providerType: formData.providerType,
+        location: formData.location,
+        foodType: formData.foodType,
+        quantity: formData.quantity,
+        unit: formData.unit,
+        contactPerson: formData.contactPerson,
+        phone: formData.phone,
+        additionalInfo: formData.additionalInfo || "",
+        createdAt: serverTimestamp()
+      });
+    } catch (error) {
+      // Optionally surface this to the user; continue to WhatsApp regardless
+      console.error("Failed to save contribution to Firestore", error);
+    }
+
     // Create WhatsApp message
     const message = `FOOD CONTRIBUTION REQUEST
 
