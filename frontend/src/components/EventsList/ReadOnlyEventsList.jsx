@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { getEvents } from '../../../../Backend/firebase/eventService.js';
 import './ReadOnlyEventsList.css';
@@ -27,37 +28,28 @@ const ReadOnlyEventsList = () => {
 
   const formatDate = (date) => {
     if (!date) return '';
-    const dateObj = date.toDate ? date.toDate() : new Date(date);
-    return dateObj.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatTime = (time) => {
-    if (!time) return '';
-    return time;
+    const d = date.toDate ? date.toDate() : new Date(date);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const getEventStatus = (date, endTime) => {
     if (!date || !endTime) return 'upcoming';
-    const dateObj = date.toDate ? date.toDate() : new Date(date);
-    const [hours, minutes] = endTime.split(':');
-    const endDateTime = new Date(dateObj);
-    endDateTime.setHours(parseInt(hours), parseInt(minutes));
+    const d = date.toDate ? date.toDate() : new Date(date);
+    const [h, m] = endTime.split(':');
+    const endDateTime = new Date(d);
+    endDateTime.setHours(parseInt(h), parseInt(m));
     const now = new Date();
-    
+
     if (endDateTime < now) return 'finished';
-    if (dateObj <= now && endDateTime >= now) return 'ongoing';
+    if (d <= now && endDateTime >= now) return 'ongoing';
     return 'upcoming';
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'ongoing': return '#4CAF50';
-      case 'finished': return '#757575';
-      default: return '#2196F3';
+      case 'ongoing': return '#10b981';
+      case 'finished': return '#6b7280';
+      default: return '#3b82f6';
     }
   };
 
@@ -67,15 +59,6 @@ const ReadOnlyEventsList = () => {
       case 'finished': return 'Completed';
       default: return 'Upcoming';
     }
-  };
-
-  const isEventFinished = (date, endTime) => {
-    if (!date || !endTime) return false;
-    const dateObj = date.toDate ? date.toDate() : new Date(date);
-    const [hours, minutes] = endTime.split(':');
-    const endDateTime = new Date(dateObj);
-    endDateTime.setHours(parseInt(hours), parseInt(minutes));
-    return endDateTime < new Date();
   };
 
   const sortEvents = (events) => {
@@ -91,62 +74,61 @@ const ReadOnlyEventsList = () => {
       <div className="readonly-events-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Loading amazing events...</p>
+          <p className="loading-text">Loading amazing events...</p>
         </div>
       </div>
     );
   }
 
-  const upcomingEvents = events.filter(event => getEventStatus(event.date, event.endTime) === 'upcoming');
-  const ongoingEvents = events.filter(event => getEventStatus(event.date, event.endTime) === 'ongoing');
-  const finishedEvents = events.filter(event => getEventStatus(event.date, event.endTime) === 'finished');
-  
-  const sortedUpcomingEvents = sortEvents(upcomingEvents);
-  const sortedOngoingEvents = sortEvents(ongoingEvents);
-  const sortedFinishedEvents = sortEvents(finishedEvents);
+  const upcoming = sortEvents(events.filter(e => getEventStatus(e.date, e.endTime) === 'upcoming'));
+  const ongoing = sortEvents(events.filter(e => getEventStatus(e.date, e.endTime) === 'ongoing'));
+  const finished = sortEvents(events.filter(e => getEventStatus(e.date, e.endTime) === 'finished'));
 
-  const renderEventCard = (event, status) => {
-    const eventStatus = getEventStatus(event.date, event.endTime);
-    
+  const renderEventCard = (event) => {
+    const status = getEventStatus(event.date, event.endTime);
+    const statusColor = getStatusColor(status);
+
     return (
-      <div key={event.id} className={`readonly-event-card ${eventStatus}`}>
+      <div key={event.id} className={`readonly-event-card ${status}`} style={{ borderColor: statusColor }}>
         <div className="event-image-container">
           {event.imageUrl ? (
             <div className="event-image" style={{ backgroundImage: `url(${event.imageUrl})` }}></div>
           ) : (
-            <div className="event-image event-image-placeholder">
-              <div className="placeholder-icon">📅</div>
-            </div>
+            <div className="event-image-placeholder">📅</div>
           )}
-          <div className="event-status-badge" style={{ backgroundColor: getStatusColor(eventStatus) }}>
-            {getStatusText(eventStatus)}
+          <div className="event-status-badge" style={{ backgroundColor: statusColor }}>
+            {getStatusText(status)}
           </div>
         </div>
-        
+
         <div className="event-content">
           <div className="event-header">
             <h3 className="event-title">{event.title}</h3>
-            <div className="event-date-badge">
-              {formatDate(event.date)}
-            </div>
+            <div className="event-date-badge">{formatDate(event.date)}</div>
           </div>
-          
+
           <div className="event-details">
-            <div className="event-detail-item">
-              <span className="detail-icon">🕒</span>
-              <span className="detail-text">{formatTime(event.time)} - {event.endTime}</span>
-            </div>
-            <div className="event-detail-item">
-              <span className="detail-icon">📍</span>
-              <span className="detail-text">{event.location}</span>
-            </div>
-            <div className="event-detail-item">
-              <span className="detail-icon">👤</span>
-              <span className="detail-text">Organized by {event.organizer}</span>
-            </div>
+            {event.time && (
+              <div className="event-detail-item">
+                <span className="detail-icon">🕒</span>
+                <span>{event.time} - {event.endTime}</span>
+              </div>
+            )}
+            {event.location && (
+              <div className="event-detail-item">
+                <span className="detail-icon">📍</span>
+                <span>{event.location}</span>
+              </div>
+            )}
+            {event.organizer && (
+              <div className="event-detail-item">
+                <span className="detail-icon">👤</span>
+                <span>Organized by {event.organizer}</span>
+              </div>
+            )}
           </div>
-          
-          <p className="event-description">{event.description}</p>
+
+          {event.description && <p className="event-description">{event.description}</p>}
         </div>
       </div>
     );
@@ -154,53 +136,42 @@ const ReadOnlyEventsList = () => {
 
   return (
     <div className="readonly-events-container">
-
       {error && (
         <div className="error-message">
-          <span className="error-icon">⚠️</span>
-          {error}
+          <span className="error-icon">⚠️</span> {error}
         </div>
       )}
 
-      {sortedOngoingEvents.length > 0 && (
+      {ongoing.length > 0 && (
         <div className="events-section ongoing-section">
           <h2 className="section-title">
-            <span className="section-icon">🔥</span>
-            Happening Now
+            <span className="section-emoji">🔥</span> Happening Now
           </h2>
-          <div className="events-grid">
-            {sortedOngoingEvents.map(event => renderEventCard(event, 'ongoing'))}
-          </div>
+          <div className="events-grid">{ongoing.map(renderEventCard)}</div>
         </div>
       )}
 
       <div className="events-section upcoming-section">
         <h2 className="section-title">
-          <span className="section-icon">📅</span>
-          Upcoming Events
+          <span className="section-emoji">✨</span> Upcoming Events
         </h2>
-        {sortedUpcomingEvents.length === 0 ? (
+        {upcoming.length === 0 ? (
           <div className="no-events">
             <div className="no-events-icon">📭</div>
-            <h3>No upcoming events</h3>
-            <p>Check back later for exciting new community events!</p>
+            <h3 className="no-events-title">No upcoming events</h3>
+            <p className="no-events-text">Check back later for exciting new community events!</p>
           </div>
         ) : (
-          <div className="events-grid">
-            {sortedUpcomingEvents.map(event => renderEventCard(event, 'upcoming'))}
-          </div>
+          <div className="events-grid">{upcoming.map(renderEventCard)}</div>
         )}
       </div>
 
-      {sortedFinishedEvents.length > 0 && (
+      {finished.length > 0 && (
         <div className="events-section finished-section">
           <h2 className="section-title">
-            <span className="section-icon">✅</span>
-            Past Events
+            <span className="section-emoji">📜</span> Past Events
           </h2>
-          <div className="events-grid">
-            {sortedFinishedEvents.map(event => renderEventCard(event, 'finished'))}
-          </div>
+          <div className="events-grid">{finished.map(renderEventCard)}</div>
         </div>
       )}
     </div>
