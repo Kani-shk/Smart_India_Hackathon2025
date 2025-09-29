@@ -6,6 +6,8 @@ import { collection, onSnapshot, orderBy, query, limit } from "firebase/firestor
 const AdminFood = () => {
   const [contributors, setContributors] = useState([]);
   const [recentSubmissions, setRecentSubmissions] = useState([]);
+  const [foodContributions, setFoodContributions] = useState([]);
+  const [showFoodContributions, setShowFoodContributions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ const AdminFood = () => {
     const unsubSubmissions = onSnapshot(submissionsQuery, (snapshot) => {
       const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setRecentSubmissions(items);
+      setFoodContributions(items); // Store food contributions data
     });
 
     return () => {
@@ -84,20 +87,21 @@ const AdminFood = () => {
                 Track all food contribution submissions
               </p>
             </div>
-            <button 
-              onClick={() => navigate('/admin/events')}
-              style={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                padding: "12px 24px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
-              }}
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button 
+                onClick={() => navigate('/admin/events')}
+                style={{
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "12px 24px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+                }}
               onMouseOver={(e) => {
                 e.target.style.transform = "translateY(-1px)";
                 e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.15)";
@@ -407,12 +411,104 @@ const AdminFood = () => {
         )}
       </div>
 
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      {/* Food Contributions Modal */}
+      {showFoodContributions && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "24px",
+            width: "90%",
+            maxWidth: "1200px",
+            maxHeight: "90vh",
+            overflow: "auto",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+          }}>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px"
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: "24px",
+                fontWeight: "700",
+                color: "#1f2937"
+              }}>Food Contributions</h2>
+              <button
+                onClick={() => setShowFoodContributions(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "24px",
+                  cursor: "pointer",
+                  color: "#6b7280"
+                }}
+              >
+                &times;
+              </button>
+            </div>
+            
+            <div style={{ overflowX: "auto" }}>
+              <table style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "14px"
+              }}>
+                <thead>
+                  <tr style={{
+                    backgroundColor: "#f3f4f6",
+                    textAlign: "left"
+                  }}>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Provider Name</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Provider Type</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Location</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Food Type</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Quantity</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Contact Person</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Phone</th>
+                    <th style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb" }}>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {foodContributions.map((contribution) => (
+                    <tr key={contribution.id} style={{
+                      borderBottom: "1px solid #e5e7eb",
+                      transition: "background-color 0.2s"
+                    }}>
+                      <td style={{ padding: "12px 16px" }}>{contribution.providerName}</td>
+                      <td style={{ padding: "12px 16px" }}>{contribution.providerType}</td>
+                      <td style={{ padding: "12px 16px" }}>{contribution.location}</td>
+                      <td style={{ padding: "12px 16px" }}>{contribution.foodType}</td>
+                      <td style={{ padding: "12px 16px" }}>{contribution.quantity} {contribution.unit}</td>
+                      <td style={{ padding: "12px 16px" }}>{contribution.contactPerson}</td>
+                      <td style={{ padding: "12px 16px" }}>{contribution.phone}</td>
+                      <td style={{ padding: "12px 16px" }}>
+                        {contribution.createdAt && contribution.createdAt.toDate ? 
+                          contribution.createdAt.toDate().toLocaleDateString() : 
+                          "N/A"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
     </div>
   );
 };

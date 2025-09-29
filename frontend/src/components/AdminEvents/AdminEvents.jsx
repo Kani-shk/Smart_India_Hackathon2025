@@ -112,6 +112,9 @@ const AdminEvents = () => {
           <button className="add-event-btn" onClick={handleAddEvent}>
             Add New Event
           </button>
+          <button className="add-event-btn" onClick={() => navigate('/admin/food')}>
+            View Food Contributions
+          </button>
           <button className="delete-event-btn" onClick={handleLogout}>
             Logout
           </button>
