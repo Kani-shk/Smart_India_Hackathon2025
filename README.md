@@ -1,6 +1,6 @@
 # SharePlate
 
-A community-driven platform designed to connect individuals and organizations to share food resources, reducing food wastage and promoting sustainability.
+we are a community-driven platform designed to connect individuals and organizations to share food resources, reducing food wastage and promoting sustainability.
 
 ## 🚀 Features
 
