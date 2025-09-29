@@ -17,10 +17,10 @@
 }
 
 .aboutus-title {
-  color: #2563eb;
+  color: #8D7B68;
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   letter-spacing: -0.5px;
 }
 
@@ -49,14 +49,14 @@
 
 .aboutus-mission {
   background: #fff;
-  border-left: 4px solid #2563eb;
+  border-left: 4px solid #8D7B68;
   padding: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
 }
 
 .mission-title {
-  color: #2563eb;
+  color: #8D7B68;
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 12px;
@@ -90,7 +90,7 @@
 }
 
 .values-title {
-  color: #2563eb;
+  color: #8D7B68;
   font-size: 2rem;
   font-weight: 700;
   text-align: center;
@@ -121,7 +121,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  background: linear-gradient(90deg, #8D7B68, #8D7B68);
 }
 
 .value-card:hover {
@@ -132,8 +132,9 @@
 .value-icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff, #ffffff);
+  border: 3px solid #B0A695;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,7 +144,7 @@
 }
 
 .value-title {
-  color: #2563eb;
+  color: #8D7B68;
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 12px;
@@ -165,7 +166,7 @@
 }
 
 .stats-title {
-  color: #2563eb;
+  color: #8D7B68;
   font-size: 1.8rem;
   font-weight: 700;
   text-align: center;
@@ -183,7 +184,7 @@
 }
 
 .stat-number {
-  color: #2563eb;
+  color: #C8B6A6;
   font-size: 2.5rem;
   font-weight: 700;
   display: block;

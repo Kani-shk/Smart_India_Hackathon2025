@@ -7,7 +7,8 @@ const Footer = () => {
       <div className="container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3>FoodShare</h3>
+          <img src="../src/assets/FooterImage.png" height="90" width="150" href="/"/>
+            {/* <h3>SharePlate</h3> */}
             <p>
               Empowering NGOs to manage food distribution events and build
               community resilience through emergency preparedness. Together, we
@@ -42,9 +43,7 @@ const Footer = () => {
               <li>
                 <a href="#donate-food">Donate Food</a>
               </li>
-              <li>
-                <a href="#emergency-fund">Emergency Fund</a>
-              </li>
+             
               <li>
                 <a href="#about">About Us</a>
               </li>
@@ -81,7 +80,7 @@ const Footer = () => {
 
         <div className="footer-bottom">
           <div className="footer-bottom-content">
-            <p>&copy; 2024 FoodShare. All rights reserved.</p>
+            <p>&copy; 2025 FoodShare. All rights reserved.</p>
             <div className="footer-links">
               <a href="#privacy">Privacy Policy</a>
               <a href="#terms">Terms of Service</a>

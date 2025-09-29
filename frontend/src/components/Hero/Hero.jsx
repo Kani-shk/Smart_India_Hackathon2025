@@ -4,6 +4,15 @@ import "./Hero.css";
 const Hero = () => {
   return (
     <section className="hero">
+      {/* Background Video */}
+      <video
+        className="hero-bg-video"
+        autoPlay
+        loop
+        muted
+        playsInline
+        src="/videos/mainpage2.mp4" 
+      />
       <div className="hero-content">
         <div className="hero-text">
           <h1 className="hero-title">
