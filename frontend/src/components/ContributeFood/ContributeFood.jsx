@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../../firebase/config";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, setDoc, doc, increment } from "firebase/firestore";
 import "./ContributeFood.css";
 
 const ContributeFood = () => {
@@ -41,6 +41,27 @@ const ContributeFood = () => {
         additionalInfo: formData.additionalInfo || "",
         createdAt: serverTimestamp()
       });
+
+      // Upsert contributor aggregate keyed by phone (normalized to digits only)
+      if (formData.phone) {
+        const phoneId = String(formData.phone).replace(/\D/g, "").trim();
+        await setDoc(
+          doc(db, "contributors", phoneId),
+          {
+            phone: phoneId,
+            name: formData.contactPerson || formData.providerName || "",
+            providerName: formData.providerName || "",
+            providerType: formData.providerType || "",
+            totalContributions: increment(1),
+            lastContributionAt: serverTimestamp(),
+            lastLocation: formData.location || "",
+            lastFoodType: formData.foodType || "",
+            lastQuantity: formData.quantity || "",
+            lastUnit: formData.unit || ""
+          },
+          { merge: true }
+        );
+      }
     } catch (error) {
       // Optionally surface this to the user; continue to WhatsApp regardless
       console.error("Failed to save contribution to Firestore", error);

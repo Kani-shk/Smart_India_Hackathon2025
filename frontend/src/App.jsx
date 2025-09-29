@@ -11,6 +11,7 @@ import "./App.css";
 import AdminLogin from "./components/AdminLogin/AdminLogin"
 import RequireAuth from "./Auth/RequireAuth"
 import AdminEvents from "./components/AdminEvents/AdminEvents"
+import AdminFood from "./components/AdminFood/AdminFood"
 
 
 function App() {
@@ -76,6 +77,18 @@ function App() {
               <Navbar />
               <RequireAuth>
                 <AdminEvents />
+              </RequireAuth>
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/admin/food"
+          element={
+            <>
+              <Navbar />
+              <RequireAuth>
+                <AdminFood />
               </RequireAuth>
               <Footer />
             </>
