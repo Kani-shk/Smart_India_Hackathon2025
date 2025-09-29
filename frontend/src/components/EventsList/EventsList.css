@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
 .events-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .events-section {
@@ -9,7 +12,7 @@
 }
 
 .events-section h2 {
-    color: #646cff;
+    color: #8D7B68;
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid #e8f5e9;
@@ -23,12 +26,12 @@
 }
 
 .events-header h1 {
-    color: #646cff;
+    color: #8D7B68;
     margin: 0;
 }
 
 .add-event-btn {
-    background-color: #646cff;
+    background-color: #8D7B68;
     color: white;
     border: none;
     border-radius: 4px;
@@ -39,7 +42,7 @@
 }
 
 .add-event-btn:hover {
-    background-color: #646cff;
+    background-color: #8D7B68;
 }
 
 .events-loading,
@@ -107,7 +110,7 @@
 .event-title {
     margin-top: 0;
     margin-bottom: 0.5rem;
-    color: #646cff;
+    color: #8D7B68;
     font-size: 1.5rem;
 }
 

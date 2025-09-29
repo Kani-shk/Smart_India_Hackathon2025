@@ -8,10 +8,20 @@
   justify-content: center;
   color: #fff;
   overflow: hidden;
-  /* Modern animated gradient background */
-  background: linear-gradient(135deg, #2563eb, #1d4ed8, #4f46e5);
-  background-size: 400% 400%;
-  animation: gradientMove 15s ease infinite;
+  /* Background video replaces gradient */
+  background: none;
+}
+/* Background video styles */
+.hero-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.7;
 }
 
 @keyframes gradientMove {
