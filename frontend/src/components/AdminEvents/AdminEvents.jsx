@@ -95,6 +95,10 @@ const AdminEvents = () => {
     navigate('/admin', { replace: true });
   };
 
+  const handleLogisticsMap = () => {
+    navigate('/admin/logistics-map');
+  };
+
   if (loading && events.length === 0) {
     return <div className="events-loading">Loading events...</div>;
   }
@@ -111,6 +115,9 @@ const AdminEvents = () => {
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="add-event-btn" onClick={handleAddEvent}>
             Add New Event
+          </button>
+          <button className="logistics-map-btn" onClick={handleLogisticsMap}>
+            Logistics Map
           </button>
           <button className="delete-event-btn" onClick={handleLogout}>
             Logout
