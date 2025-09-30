@@ -3,8 +3,23 @@ import { addLogistics } from '../../../../Backend/firebase/logisticsService';
 import { geocodeAddress, parseCoordinates, isWithinIndia, getCurrentLocation, reverseGeocode } from '../../services/geocodingService';
 import './LogisticsForm.css';
 
-const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
-  const [formData, setFormData] = useState({
+interface LogisticsFormProps {
+  onSuccess: () => void;
+  onCancel: () => void;
+  initialCoordinates?: [number, number] | null;
+}
+
+interface FormData {
+  name: string;
+  type: string;
+  address: string;
+  coordinates: string;
+  contact: string;
+  status: string;
+}
+
+const LogisticsForm: React.FC<LogisticsFormProps> = ({ onSuccess, onCancel, initialCoordinates = null }) => {
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     type: 'Truck Service',
     address: '',
@@ -12,11 +27,11 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     contact: '',
     status: 'active'
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [addressSuggestions, setAddressSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [coordinateMode, setCoordinateMode] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [coordinateMode, setCoordinateMode] = useState<boolean>(false);
 
   const logisticsTypes = [
     'Truck Service',
@@ -32,7 +47,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
   ];
 
   useEffect(() => {
-    const initializeLocation = async () => {
+    const initializeLocation = async (): Promise<void> => {
       if (initialCoordinates) {
         // Use provided coordinates
         setFormData(prev => ({
@@ -78,7 +93,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     initializeLocation();
   }, [initialCoordinates]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -87,7 +102,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     setError('');
   };
 
-  const handleAddressChange = async (value) => {
+  const handleAddressChange = async (value: string): Promise<void> => {
     setFormData(prev => ({
       ...prev,
       address: value
@@ -111,7 +126,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     }
   };
 
-  const handleSuggestionSelect = async (suggestion) => {
+  const handleSuggestionSelect = async (suggestion: any): Promise<void> => {
     setFormData(prev => ({
       ...prev,
       address: suggestion.display_name,
@@ -122,7 +137,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     setShowSuggestions(false);
   };
 
-  const handleCoordinateChange = (e) => {
+  const handleCoordinateChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -146,7 +161,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     }
   };
 
-  const validateForm = () => {
+  const validateForm = (): boolean => {
     if (!formData.name.trim()) {
       setError('Name is required');
       return false;
@@ -174,7 +189,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -206,7 +221,7 @@ const LogisticsForm = ({ onSuccess, onCancel, initialCoordinates = null }) => {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setFormData({
       name: '',
       type: 'Truck Service',
