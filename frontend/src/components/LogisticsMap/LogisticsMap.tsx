@@ -15,6 +15,37 @@ import {
 import LogisticsForm from './LogisticsForm';
 import './LogisticsMap.css';
 
+// TypeScript interfaces
+interface LogisticsItem {
+  id: string;
+  name: string;
+  type: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  contact: string;
+  status: string;
+}
+
+interface ConnectionLine {
+  from: [number, number];
+  to: [number, number];
+  distance: number;
+}
+
+interface MapControllerProps {
+  center: [number, number];
+  zoom: number;
+}
+
+interface EditFormData {
+  id: string;
+  name: string;
+  contact: string;
+  latitude: number;
+  longitude: number;
+}
+
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -38,7 +69,14 @@ const centerIcon = new L.Icon({
   popupAnchor: [1, -30],
 });
 
-const MapController = ({ center, zoom }) => {
+const currentLocationIcon = new L.Icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+  iconSize: [35, 35],
+  iconAnchor: [17, 35],
+  popupAnchor: [1, -35],
+});
+
+const MapController: React.FC<MapControllerProps> = ({ center, zoom }) => {
   const map = useMap();
   
   useEffect(() => {
@@ -50,34 +88,38 @@ const MapController = ({ center, zoom }) => {
   return null;
 };
 
-const LogisticsMap = () => {
+const LogisticsMap: React.FC = () => {
   const navigate = useNavigate();
-  const [logistics, setLogistics] = useState([]);
-  const [filteredLogistics, setFilteredLogistics] = useState([]);
-  const [searchLocation, setSearchLocation] = useState('');
-  const [coordinateInput, setCoordinateInput] = useState('');
-  const [searchType, setSearchType] = useState('address'); // 'address' or 'coordinates'
-  const [center, setCenter] = useState([28.6139, 77.2090]); // Default to Delhi
-  const [zoom, setZoom] = useState(10);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedLogistics, setSelectedLogistics] = useState(null);
-  const [radius, setRadius] = useState(50); // km
-  const [currentAddress, setCurrentAddress] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [clickedCoordinates, setClickedCoordinates] = useState(null);
-  const mapRef = useRef();
+  const [logistics, setLogistics] = useState<LogisticsItem[]>([]);
+  const [filteredLogistics, setFilteredLogistics] = useState<LogisticsItem[]>([]);
+  const [searchLocation, setSearchLocation] = useState<string>('');
+  const [coordinateInput, setCoordinateInput] = useState<string>('');
+  const [searchType, setSearchType] = useState<'address' | 'coordinates'>('address');
+  const [center, setCenter] = useState<[number, number]>([28.6139, 77.2090]); // Default to Delhi
+  const [zoom, setZoom] = useState<number>(10);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedLogistics, setSelectedLogistics] = useState<LogisticsItem | null>(null);
+  const [radius, setRadius] = useState<number>(50); // km
+  const [currentAddress, setCurrentAddress] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+  const [clickedCoordinates, setClickedCoordinates] = useState<[number, number] | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
+  const [showEditForm, setShowEditForm] = useState<boolean>(false);
+  const [editingLogistics, setEditingLogistics] = useState<LogisticsItem | null>(null);
+  const mapRef = useRef<L.Map>(null);
 
   useEffect(() => {
     fetchLogistics();
+    getCurrentUserLocation();
   }, []);
 
   // Close suggestions when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showSuggestions && !event.target.closest('.address-input-wrapper')) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showSuggestions && !(event.target as Element).closest('.address-input-wrapper')) {
         setShowSuggestions(false);
       }
     };
@@ -88,7 +130,27 @@ const LogisticsMap = () => {
     };
   }, [showSuggestions]);
 
-  const fetchLogistics = async () => {
+  const getCurrentUserLocation = async (): Promise<void> => {
+    try {
+      const location = await getCurrentLocation();
+      const coordinates: [number, number] = [location.latitude, location.longitude];
+      setCurrentLocation(coordinates);
+      
+      // Get address from coordinates
+      try {
+        const reverseResult = await reverseGeocode(location.latitude, location.longitude);
+        if (reverseResult) {
+          setCurrentAddress(reverseResult.address);
+        }
+      } catch (err) {
+        console.warn('Reverse geocoding failed:', err);
+      }
+    } catch (err) {
+      console.warn('Failed to get current location:', err);
+    }
+  };
+
+  const fetchLogistics = async (): Promise<void> => {
     try {
       setLoading(true);
       const logisticsData = await getLogistics();
@@ -103,7 +165,7 @@ const LogisticsMap = () => {
     }
   };
 
-  const handleLocationSearch = async () => {
+  const handleLocationSearch = async (): Promise<void> => {
     const searchValue = searchType === 'address' ? searchLocation.trim() : coordinateInput.trim();
     
     if (!searchValue) {
@@ -116,7 +178,7 @@ const LogisticsMap = () => {
       setError(null);
       setShowSuggestions(false);
 
-      let coordinates;
+      let coordinates: [number, number];
       let address = '';
 
       if (searchType === 'coordinates') {
@@ -177,7 +239,7 @@ const LogisticsMap = () => {
   };
 
   // Handle address input changes for suggestions
-  const handleAddressChange = async (value) => {
+  const handleAddressChange = async (value: string): Promise<void> => {
     setSearchLocation(value);
     
     if (value.length > 2) {
@@ -195,23 +257,24 @@ const LogisticsMap = () => {
   };
 
   // Handle suggestion selection
-  const handleSuggestionSelect = (suggestion) => {
+  const handleSuggestionSelect = (suggestion: any): void => {
     setSearchLocation(suggestion.display_name);
     setSuggestions([]);
     setShowSuggestions(false);
   };
 
   // Get current location
-  const handleCurrentLocation = async () => {
+  const handleCurrentLocation = async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
       
       const location = await getCurrentLocation();
-      const coordinates = [location.latitude, location.longitude];
+      const coordinates: [number, number] = [location.latitude, location.longitude];
       
       setCenter(coordinates);
       setZoom(15);
+      setCurrentLocation(coordinates);
       
       // Get address from coordinates
       try {
@@ -238,13 +301,13 @@ const LogisticsMap = () => {
     }
   };
 
-  const handleLogisticsClick = (logisticsItem) => {
+  const handleLogisticsClick = (logisticsItem: LogisticsItem): void => {
     setSelectedLogistics(logisticsItem);
     setCenter([logisticsItem.latitude, logisticsItem.longitude]);
     setZoom(15);
   };
 
-  const handleAddLogistics = async () => {
+  const handleAddLogistics = async (): Promise<void> => {
     setShowAddForm(true);
     setClickedCoordinates(null);
     
@@ -258,42 +321,58 @@ const LogisticsMap = () => {
     }
   };
 
-  const handleMapClick = (e) => {
+  const handleMapClick = (e: L.LeafletMouseEvent): void => {
     if (showAddForm) {
       const { lat, lng } = e.latlng;
       setClickedCoordinates([lat, lng]);
     }
   };
 
-  const handleFormSuccess = () => {
+  const handleFormSuccess = (): void => {
     setShowAddForm(false);
     setClickedCoordinates(null);
     fetchLogistics(); // Refresh the logistics list
   };
 
-  const handleFormCancel = () => {
+  const handleFormCancel = (): void => {
     setShowAddForm(false);
     setClickedCoordinates(null);
   };
 
-  const getDistanceFromCenter = (logisticsItem) => {
+  const getDistanceFromCenter = (logisticsItem: LogisticsItem): number => {
     if (!center) return 0;
     return calculateDistance(center[0], center[1], logisticsItem.latitude, logisticsItem.longitude);
   };
 
-  const getConnectionLines = () => {
-    if (!selectedLogistics || !center) return [];
+  const getConnectionLines = (): ConnectionLine[] => {
+    if (!currentLocation) return [];
     
     return filteredLogistics.map(logisticsItem => ({
-      from: [selectedLogistics.latitude, selectedLogistics.longitude],
+      from: currentLocation,
       to: [logisticsItem.latitude, logisticsItem.longitude],
       distance: calculateDistance(
-        selectedLogistics.latitude, 
-        selectedLogistics.longitude, 
+        currentLocation[0], 
+        currentLocation[1], 
         logisticsItem.latitude, 
         logisticsItem.longitude
       )
     }));
+  };
+
+  const handleEditLogistics = (logisticsItem: LogisticsItem): void => {
+    setEditingLogistics(logisticsItem);
+    setShowEditForm(true);
+  };
+
+  const handleEditFormSuccess = (): void => {
+    setShowEditForm(false);
+    setEditingLogistics(null);
+    fetchLogistics(); // Refresh the logistics list
+  };
+
+  const handleEditFormCancel = (): void => {
+    setShowEditForm(false);
+    setEditingLogistics(null);
   };
 
   const connectionLines = getConnectionLines();
@@ -469,6 +548,19 @@ const LogisticsMap = () => {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             
+            {/* Current location marker */}
+            {currentLocation && (
+              <Marker position={currentLocation} icon={currentLocationIcon}>
+                <Popup>
+                  <div>
+                    <strong>Your Current Location</strong>
+                    <br />
+                    {currentAddress || 'Current Location'}
+                  </div>
+                </Popup>
+              </Marker>
+            )}
+
             {/* Center marker */}
             <Marker position={center} icon={centerIcon}>
               <Popup>
@@ -488,29 +580,39 @@ const LogisticsMap = () => {
                 icon={logisticsIcon}
               >
                 <Popup>
-                  <div>
+                  <div className="logistics-popup">
                     <strong>{logisticsItem.name}</strong>
                     <br />
                     <em>{logisticsItem.type}</em>
                     <br />
                     {logisticsItem.address}
                     <br />
+                    <strong>Contact:</strong> {logisticsItem.contact || 'Not provided'}
+                    <br />
                     <small>
                       Distance: {getDistanceFromCenter(logisticsItem).toFixed(2)} km
                     </small>
+                    <br />
+                    <button 
+                      className="edit-logistics-btn"
+                      onClick={() => handleEditLogistics(logisticsItem)}
+                    >
+                      ✏️ Edit
+                    </button>
                   </div>
                 </Popup>
               </Marker>
             ))}
 
-            {/* Connection lines */}
-            {selectedLogistics && connectionLines.map((line, index) => (
+            {/* Dotted connection lines from current location to logistics markers */}
+            {currentLocation && connectionLines.map((line, index) => (
               <Polyline
                 key={index}
                 positions={[line.from, line.to]}
                 color={line.distance < 10 ? '#28a745' : line.distance < 25 ? '#ffc107' : '#dc3545'}
-                weight={2}
-                opacity={0.7}
+                weight={3}
+                opacity={0.8}
+                dashArray="5,10"
               />
             ))}
           </MapContainer>
@@ -525,6 +627,184 @@ const LogisticsMap = () => {
           initialCoordinates={clickedCoordinates}
         />
       )}
+
+      {showEditForm && editingLogistics && (
+        <EditLogisticsForm
+          logistics={editingLogistics}
+          onSuccess={handleEditFormSuccess}
+          onCancel={handleEditFormCancel}
+        />
+      )}
+    </div>
+  );
+};
+
+// Edit Logistics Form Component
+interface EditLogisticsFormProps {
+  logistics: LogisticsItem;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
+
+const EditLogisticsForm: React.FC<EditLogisticsFormProps> = ({ logistics, onSuccess, onCancel }) => {
+  const [formData, setFormData] = useState<EditFormData>({
+    id: logistics.id,
+    name: logistics.name,
+    contact: logistics.contact,
+    latitude: logistics.latitude,
+    longitude: logistics.longitude
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setError('');
+  };
+
+  const handleCoordinateChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    const numValue = parseFloat(value);
+    
+    if (!isNaN(numValue)) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: numValue
+      }));
+    }
+    setError('');
+  };
+
+  const validateForm = (): boolean => {
+    if (!formData.name.trim()) {
+      setError('Name is required');
+      return false;
+    }
+    if (!formData.contact.trim()) {
+      setError('Contact is required');
+      return false;
+    }
+    if (isNaN(formData.latitude) || isNaN(formData.longitude)) {
+      setError('Valid coordinates are required');
+      return false;
+    }
+    if (!isWithinIndia(formData.latitude, formData.longitude)) {
+      setError('Coordinates must be within India');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+
+      // Update logistics in state (for now, since we're using local state)
+      // In a real app, you'd call an API to update the backend
+      const updatedLogistics = {
+        ...logistics,
+        name: formData.name.trim(),
+        contact: formData.contact.trim(),
+        latitude: formData.latitude,
+        longitude: formData.longitude
+      };
+
+      // Here you would typically call an update API
+      // await updateLogistics(updatedLogistics);
+      
+      onSuccess();
+    } catch (err) {
+      setError('Failed to update logistics. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="logistics-form-overlay">
+      <div className="logistics-form-container">
+        <div className="logistics-form-header">
+          <h3>Edit Transport Logistics Service</h3>
+          <button className="close-btn" onClick={onCancel}>×</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="logistics-form">
+          <div className="form-group">
+            <label htmlFor="name">Name *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Enter transport service name"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="contact">Contact *</label>
+            <input
+              type="text"
+              id="contact"
+              name="contact"
+              value={formData.contact}
+              onChange={handleInputChange}
+              placeholder="e.g., +91-9876543210"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="latitude">Latitude *</label>
+            <input
+              type="number"
+              id="latitude"
+              name="latitude"
+              value={formData.latitude}
+              onChange={handleCoordinateChange}
+              step="any"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="longitude">Longitude *</label>
+            <input
+              type="number"
+              id="longitude"
+              name="longitude"
+              value={formData.longitude}
+              onChange={handleCoordinateChange}
+              step="any"
+              required
+            />
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="form-actions">
+            <button type="button" onClick={onCancel} className="cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" disabled={loading} className="submit-btn">
+              {loading ? 'Updating...' : 'Update Transport Service'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
