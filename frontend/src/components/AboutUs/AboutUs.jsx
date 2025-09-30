@@ -6,7 +6,7 @@ const AboutUs = () => {
     <section className="aboutus-section">
       <div className="aboutus-container">
         <div className="aboutus-header">
-          <h1 className="aboutus-title">About Our Organization</h1>
+          <h1 id="aboutus" className="aboutus-title">About Our Organization</h1>
           <p className="aboutus-subtitle">
             Dedicated to fighting hunger and building stronger communities through compassion, 
             collaboration, and sustainable food distribution programs.

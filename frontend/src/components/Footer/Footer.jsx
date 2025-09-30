@@ -38,14 +38,13 @@ const Footer = () => {
                 <a href="#home">Home</a>
               </li>
               <li>
-                <a href="#events">Events</a>
+                <a href="/events">Events</a>
               </li>
               <li>
-                <a href="#donate-food">Donate Food</a>
+                <a href="/contribute_food">Donate Food</a>
               </li>
-             
               <li>
-                <a href="#about">About Us</a>
+                <a href="/#aboutus">About Us</a>
               </li>
             </ul>
           </div>
